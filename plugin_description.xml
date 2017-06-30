@@ -1,0 +1,9 @@
+<library path="lib/libtf_visual_tools_gui">
+  <class name="tf_visual_tools/TFVisualTools"
+	 type="tf_visual_tools::TFVisualTools"
+	 base_class_type="rviz::Panel">
+    <description>
+      A panel widget that allows you to create and control TFs.
+    </description>
+  </class>
+</library>

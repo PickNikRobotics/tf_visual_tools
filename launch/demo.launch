@@ -1,0 +1,8 @@
+<launch>
+  
+  <!-- start rviz -->
+  <node name="$(anon rviz)" pkg="rviz" type="rviz" args="-d $(find tf_visual_tools)/launch/demo.rviz" output="screen"/>
+
+  <node pkg="tf_visual_tools" type="tf_visual_tools" name="rviz_tfs" output="screen" />
+  
+</launch>

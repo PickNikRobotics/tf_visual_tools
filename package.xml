@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tf_visual_tools</name>
+  <version>0.1.0</version>
+  <description>Allows manual control of a TF through an Rviz plugin</description>
+
+  <maintainer email="davetcoleman@gmail.com">Dave Coleman</maintainer>
+  <maintainer email="mcevoy.andy@gmail.com">Andy McEvoy</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">https://github.com/davetcoleman/tf_visual_tools</url>
+  <url type="bugtracker">https://github.com/davetcoleman/tf_visual_tools/issues</url>
+  <url type="repository">https://github.com/davetcoleman/tf_visual_tools/</url>
+
+  <author email="davetcoleman@gmail.com">Dave Coleman</author>
+  <author email="mcevoy.andy@gmail.com">Andy McEvoy</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rviz</depend>
+  <depend>rviz_visual_tools</depend>
+  <depend>roscpp</depend>
+  <depend>tf2</depend>
+  <depend>tf2_msgs</depend>
+  <depend>tf</depend>
+  <depend>roslib</depend>
+  <depend>rosparam_shortcuts</depend>
+  <depend>cmake_modules</depend>
+  <depend>roslint</depend>
+  <depend>tf_conversions</depend>
+  <depend>interactive_markers</depend>
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <export>
+    <rviz plugin="${prefix}/plugin_description.xml"/>
+  </export>
+</package>
