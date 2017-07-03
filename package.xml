@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>tf_visual_tools</name>
-  <version>0.1.0</version>
+  <version>0.0.1</version>
   <description>Allows manual control of a TF through an Rviz plugin</description>
 
-  <maintainer email="davetcoleman@gmail.com">Dave Coleman</maintainer>
   <maintainer email="mcevoy.andy@gmail.com">Andy McEvoy</maintainer>
-
+  <maintainer email="davetcoleman@gmail.com">Dave Coleman</maintainer>
+  
   <license>BSD</license>
 
-  <url type="website">https://github.com/davetcoleman/tf_visual_tools</url>
-  <url type="bugtracker">https://github.com/davetcoleman/tf_visual_tools/issues</url>
-  <url type="repository">https://github.com/davetcoleman/tf_visual_tools/</url>
+  <url type="website">https://github.com/mcevoyandy/tf_visual_tools</url>
+  <url type="bugtracker">https://github.com/mcevoyandy/tf_visual_tools/issues</url>
+  <url type="repository">https://github.com/mcevoyandy/tf_visual_tools/</url>
 
   <author email="davetcoleman@gmail.com">Dave Coleman</author>
   <author email="mcevoy.andy@gmail.com">Andy McEvoy</author>
