@@ -33,8 +33,7 @@
  */
 #include <stdio.h>
 
-// TODO: Why doesn't example put this in the include dir?
-// Looks like it doesn't work if *.h is in include dir?
+// TODO: Why won't this compile when moved to include dir?
 #include "tf_visual_tools_gui.h"
 
 namespace tf_visual_tools
@@ -91,7 +90,8 @@ createTFTab::createTFTab(QWidget *parent) : QWidget(parent)
   
   from_ = new QComboBox;
   from_->setEditable(true);
-  from_->addItem(tr("Select existing or add new TF"));
+  from_->lineEdit()->setPlaceholderText("Add new or select existing");
+  //from_->addItem(tr("Select existing or add new TF"));
   connect(from_, SIGNAL(editTextChanged(const QString &)), this, SLOT(fromTextChanged(const QString &)));
   
   to_ = new QLineEdit;
@@ -385,7 +385,8 @@ void createTFTab::updateFromList()
   
   // update from list
   from_->clear();
-  from_->addItem(tr("Select existing or add new TF"));
+  //from_->addItem(tr("Select existing or add new TF"));
+  from_->lineEdit()->setPlaceholderText("Add new or select existing");
   std::vector<std::string> names = remote_receiver_->getTFNames();
   for (std::size_t i = 0; i < names.size(); i++)
   {
@@ -440,7 +441,8 @@ void createTFTab::removeTF()
 
   // update from list
   from_->clear();
-  from_->addItem(tr("Select existing or add new TF"));
+  // from_->addItem(tr("Select existing or add new TF"));
+  from_->lineEdit()->setPlaceholderText("Add new or select existing");
   std::list<std::string> names;
   for (std::size_t i = 0; i < active_tf_list_.size(); i++)
   {
@@ -510,17 +512,21 @@ manipulateTFTab::manipulateTFTab(QWidget *parent) : QWidget(parent)
 
   // Set up xyr rpy increment controls
   QGroupBox *tf_increment_section = new QGroupBox(tr("Increment TF"));
-  QGridLayout *grid_layout = new QGridLayout();
   
-  std::vector<std::string> labels = { "x (m):", "y (m):", "z (m):", "r (deg):", "p (deg):", "y (deg):"};
-  for (std::size_t i = 0; i < labels.size(); i++)
+  QLabel *xyz_label = new QLabel(tr("xyz (m)"));
+  xyz_label->setAlignment(Qt::AlignCenter);
+  QLabel *rpy_label = new QLabel(tr("rpy (deg)"));
+  rpy_label->setAlignment(Qt::AlignCenter);
+  
+  QHBoxLayout *increment_controls[6];
+  
+  for (std::size_t i = 0; i < 6; i++)
   { 
-    QLabel *label = new QLabel(tr(labels[i].c_str()));
-    
     QPushButton *minus = new QPushButton;
     minus->setText("-");
     minus->setProperty("sign", -1.0);
     minus->setProperty("dof", (int)i);
+    minus->setMinimumWidth(25);
     connect(minus, SIGNAL(clicked()), this, SLOT(incrementDOF()));
     
     QLineEdit *value = new QLineEdit;
@@ -532,17 +538,33 @@ manipulateTFTab::manipulateTFTab(QWidget *parent) : QWidget(parent)
     QPushButton *plus = new QPushButton;
     plus->setText("+");
     plus->setProperty("sign", 1.0);
-    plus->setProperty("dof", (int)i);    
+    plus->setProperty("dof", (int)i);
+    plus->setMinimumWidth(25);
     connect(plus, SIGNAL(clicked()), this, SLOT(incrementDOF()));
 
-    grid_layout->addWidget(label, i, 1);
-    grid_layout->addWidget(minus, i, 2);
-    grid_layout->addWidget(value, i, 3);
-    grid_layout->addWidget(plus, i, 4);
+    increment_controls[i] = new QHBoxLayout;
+    increment_controls[i]->addWidget(minus);
+    increment_controls[i]->addWidget(value);
+    increment_controls[i]->addWidget(plus);
   }
 
-  tf_increment_section->setLayout(grid_layout);
+  QVBoxLayout *xyz_controls = new QVBoxLayout;
+  xyz_controls->addWidget(xyz_label);
+  xyz_controls->addLayout(increment_controls[0]);
+  xyz_controls->addLayout(increment_controls[1]);
+  xyz_controls->addLayout(increment_controls[2]);
 
+  QVBoxLayout *rpy_controls = new QVBoxLayout;
+  rpy_controls->addWidget(rpy_label);
+  rpy_controls->addLayout(increment_controls[3]);
+  rpy_controls->addLayout(increment_controls[4]);
+  rpy_controls->addLayout(increment_controls[5]);
+
+  QHBoxLayout *controls = new QHBoxLayout;
+  controls->addLayout(xyz_controls);
+  controls->addLayout(rpy_controls);
+  tf_increment_section->setLayout(controls);
+  
   // set main layout
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addWidget(tf_ctrl_section);

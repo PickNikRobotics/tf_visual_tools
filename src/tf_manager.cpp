@@ -79,7 +79,6 @@ void RvizTFPublisher::updateTF(geometry_msgs::TransformStamped update_tf_msg)
 
 void RvizTFPublisher::publishTFs()
 {
-  ROS_DEBUG_STREAM_THROTTLE_NAMED(1,"publishTFs","publishing TFs: " << active_tfs_.size());
   static tf::TransformBroadcaster br;
 
   for (std::size_t i = 0; i < active_tfs_.size(); i++)
