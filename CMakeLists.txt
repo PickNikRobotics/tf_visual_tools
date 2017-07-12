@@ -108,9 +108,9 @@ add_library(${PROJECT_NAME}_tf_manager
 target_link_libraries(${PROJECT_NAME}_tf_manager
   ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME}_publisher
   src/tf_publisher.cpp)
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_publisher
   ${PROJECT_NAME}_tf_manager
   ${catkin_LIBRARIES})
 
