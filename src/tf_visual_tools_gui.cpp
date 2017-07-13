@@ -54,7 +54,8 @@ TFVisualTools::TFVisualTools(QWidget* parent) : rviz::Panel(parent)
 
   new_manipulate_tab_ = new manipulateTFTab();
   tab_widget_->addTab(new_manipulate_tab_, tr("Manipulate"));
-
+  new_create_tab_->manipulate_tab_ = new_manipulate_tab_;
+  
   new_save_load_tab_ = new saveLoadTFTab(); 
   tab_widget_->addTab(new_save_load_tab_, tr("Save / Load"));
 
@@ -283,8 +284,6 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
     std::string line;
     int menu_idx = 1;
 
-    // std::string menu_name(name);
-
     if (in_file.is_open())
     {
       while (std::getline(in_file, line))
@@ -311,7 +310,6 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 
           if (num_sub_menus == 0)
           {
-            //ROS_DEBUG_STREAM_NAMED("createNewIMarker","create main item: " << menu_idx << ", " << menu_name);
             imarker_menu_handler_.insert(menu_name, boost::bind( &createTFTab::processIMarkerFeedback, this, _1));
             menu_str = menu_name;
             remote_receiver_->addIMarkerMenuPub(menu_idx, menu_str); 
@@ -319,7 +317,6 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
           }
           else
           {
-            //ROS_DEBUG_STREAM_NAMED("createNewIMarker","create sub menu: " << menu_idx << ", " << menu_name);
             sub_menu_handle = imarker_menu_handler_.insert(menu_name);
             menu_str = menu_name;
             menu_idx++;
@@ -337,7 +334,6 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
           
           if (result == 1)
           {
-            //ROS_DEBUG_STREAM_NAMED("createNewIMarker","create sub menu: " << menu_idx << ", " << menu_name);
             imarker_menu_handler_.insert(sub_menu_handle, menu_name, boost::bind( &createTFTab::processIMarkerFeedback, this, _1));
             sub_menu_str = menu_name;
             remote_receiver_->addIMarkerMenuPub(menu_idx, menu_str + "_" + sub_menu_str);
@@ -357,16 +353,13 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 
 void createTFTab::processIMarkerFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
-  ROS_DEBUG_STREAM_NAMED("processIMarkerFeedback","Feedback from " << feedback->marker_name);
-
   QString imarker_name = QString::fromStdString(feedback->marker_name);
-  
   for (std::size_t i = 0; i < active_tf_list_.size(); i++)
   {
     if (active_tf_list_[i].name_ == imarker_name)
     {
-      ROS_DEBUG_STREAM_NAMED("processIMarkerFeedback","update index = " << i);
       manipulateTFTab::updateTFValues(i, feedback->pose);
+      manipulate_tab_->updateTFList();
       remote_receiver_->updateTF(active_tf_list_[i].getTFMsg());
       break;
     }
@@ -385,7 +378,6 @@ void createTFTab::updateFromList()
   
   // update from list
   from_->clear();
-  //from_->addItem(tr("Select existing or add new TF"));
   from_->lineEdit()->setPlaceholderText("Add new or select existing");
   std::vector<std::string> names = remote_receiver_->getTFNames();
   for (std::size_t i = 0; i < names.size(); i++)
@@ -441,7 +433,6 @@ void createTFTab::removeTF()
 
   // update from list
   from_->clear();
-  // from_->addItem(tr("Select existing or add new TF"));
   from_->lineEdit()->setPlaceholderText("Add new or select existing");
   std::list<std::string> names;
   for (std::size_t i = 0; i < active_tf_list_.size(); i++)
@@ -478,48 +469,45 @@ manipulateTFTab::manipulateTFTab(QWidget *parent) : QWidget(parent)
   active_tfs_->addItem(tr("Select TF"));
   connect(active_tfs_, SIGNAL(activated(int)), this, SLOT(setQLineValues(int)));
 
-  QLabel *xyz_delta_label = new QLabel(tr("xyz delta (m):"));
+  QLabel *xyz_delta_label = new QLabel(QChar(0x0394) + tr("xyz (m):")); // 0x0394 = delta symbol
   xyz_delta_box_ = new QLineEdit;
   xyz_delta_box_->setText("0.1");
   xyz_delta_ = 0.1;
   connect(xyz_delta_box_, SIGNAL(textChanged(const QString &)), this, SLOT(setXYZDelta(const QString &)));
 
-  QLabel *rpy_delta_label = new QLabel(tr("rpy delta (deg):"));
+  QLabel *rpy_delta_label = new QLabel(QChar(0x0394) + tr("rpy (deg):"));
   rpy_delta_box_ = new QLineEdit;
   rpy_delta_box_->setText("5.0");
   rpy_delta_ = 5.0;
   connect(rpy_delta_box_, SIGNAL(textChanged(const QString &)), this, SLOT(setRPYDelta(const QString &)));
 
-  QGroupBox *tf_ctrl_section = new QGroupBox(tr("Manipulation Data"));
+  QGroupBox *tf_ctrl_section = new QGroupBox(tr("Manipulate TF"));
 
   QHBoxLayout *tf_row = new QHBoxLayout;
   tf_row->addWidget(tf_label);
   tf_row->addWidget(active_tfs_);
 
-  QHBoxLayout *xyz_delta_row = new QHBoxLayout;
-  xyz_delta_row->addWidget(xyz_delta_label);
-  xyz_delta_row->addWidget(xyz_delta_box_);
-
-  QHBoxLayout *rpy_delta_row = new QHBoxLayout;
-  rpy_delta_row->addWidget(rpy_delta_label);
-  rpy_delta_row->addWidget(rpy_delta_box_);
+  QHBoxLayout *delta_row = new QHBoxLayout;
+  delta_row->addWidget(xyz_delta_label);
+  delta_row->addWidget(xyz_delta_box_);
+  delta_row->addWidget(rpy_delta_label);
+  delta_row->addWidget(rpy_delta_box_);
   
   QVBoxLayout *tf_controls = new QVBoxLayout;
   tf_controls->addLayout(tf_row);
-  tf_controls->addLayout(xyz_delta_row);
-  tf_controls->addLayout(rpy_delta_row);
+  tf_controls->addLayout(delta_row);
   tf_ctrl_section->setLayout(tf_controls);
 
-  // Set up xyr rpy increment controls
-  QGroupBox *tf_increment_section = new QGroupBox(tr("Increment TF"));
-  
+  // Set up xyr rpy increment controls  
   QLabel *xyz_label = new QLabel(tr("xyz (m)"));
   xyz_label->setAlignment(Qt::AlignCenter);
+  
   QLabel *rpy_label = new QLabel(tr("rpy (deg)"));
   rpy_label->setAlignment(Qt::AlignCenter);
-  
+
+  // create +/- buttons and line edit control for each dof
   QHBoxLayout *increment_controls[6];
-  
+
   for (std::size_t i = 0; i < 6; i++)
   { 
     QPushButton *minus = new QPushButton;
@@ -563,12 +551,11 @@ manipulateTFTab::manipulateTFTab(QWidget *parent) : QWidget(parent)
   QHBoxLayout *controls = new QHBoxLayout;
   controls->addLayout(xyz_controls);
   controls->addLayout(rpy_controls);
-  tf_increment_section->setLayout(controls);
   
   // set main layout
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addWidget(tf_ctrl_section);
-  main_layout->addWidget(tf_increment_section);
+  main_layout->addLayout(controls);
   setLayout(main_layout);
   
   remote_receiver_ = &TFRemoteReceiver::getInstance();
@@ -583,55 +570,42 @@ void manipulateTFTab::keyPressEvent(QKeyEvent *event)
   switch (event->key())
   {
     case Qt::Key_A:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","x+");
       incrementDOF(0, 1.0);
       break;
     case Qt::Key_Q:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","x-");
       incrementDOF(0, -1.0);
       break;
     case Qt::Key_W:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","y+");
       incrementDOF(1, 1.0);
       break;
     case Qt::Key_S:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","y-");
       incrementDOF(1, -1.0);
       break;
     case Qt::Key_E:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","z+");
       incrementDOF(2, 1.0);
       break;
     case Qt::Key_D:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","z-");
       incrementDOF(2, -1.0);
       break;
     case Qt::Key_R:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","roll+");
       incrementDOF(3, 1.0);
       break;
     case Qt::Key_F:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","roll-");
       incrementDOF(3, -1.0);
       break;
     case Qt::Key_T:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","pitch+");
       incrementDOF(4, 1.0);
       break;
     case Qt::Key_G:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","pitch-");
       incrementDOF(4, -1.0);
       break;
     case Qt::Key_Y:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","yaw+");
       incrementDOF(5, 1.0);
       break;
     case Qt::Key_H:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","yaw-");
       incrementDOF(5, -1.0);
       break;
     case Qt::Key_U:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","fast");
       xyz_delta = 0.1;
       rpy_delta = 5.0; // degrees
       xyz_delta_box_->setText(QString::number(xyz_delta));
@@ -640,7 +614,6 @@ void manipulateTFTab::keyPressEvent(QKeyEvent *event)
       setRPYDelta(rpy_delta);
       break;
     case Qt::Key_I:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","medium");
       xyz_delta = 0.01;
       rpy_delta = 1.0; // degrees
       xyz_delta_box_->setText(QString::number(xyz_delta));
@@ -649,7 +622,6 @@ void manipulateTFTab::keyPressEvent(QKeyEvent *event)
       setRPYDelta(rpy_delta);      
       break;
     case Qt::Key_O:
-      ROS_DEBUG_STREAM_NAMED("keyPressEvent","slow");
       xyz_delta = 0.001;
       rpy_delta = 0.5; // degrees
       xyz_delta_box_->setText(QString::number(xyz_delta));
@@ -665,14 +637,17 @@ void manipulateTFTab::keyPressEvent(QKeyEvent *event)
 
 void manipulateTFTab::setQLineValues(int item_id)
 {
+  double precision;
   for (std::size_t i = 0; i < active_tf_list_.size(); i++)
   {
     if (active_tf_list_[i].name_ == active_tfs_->currentText())
     {
-      ROS_DEBUG_STREAM_NAMED("setQLineValues","name_ = " << active_tf_list_[i].name_.toStdString());
       for (std::size_t j = 0; j < 6; j++)
       {
-        dof_qline_edits_[j]->setText(QString::number(active_tf_list_[i].values_[j]));
+        j > 2 ? precision = 100.0 : precision = 10000.0;
+        double value = active_tf_list_[i].values_[j];
+        value = round(value * precision) / precision;
+        dof_qline_edits_[j]->setText(QString::number(value));
       }
       break;
     }
@@ -731,7 +706,7 @@ void manipulateTFTab::updateTFValues(int idx, geometry_msgs::Pose pose)
   Eigen::Quaterniond eigen_quaternion;
   tf::quaternionMsgToEigen(pose.orientation, eigen_quaternion);
   Eigen::Vector3d euler_angles = eigen_quaternion.toRotationMatrix().eulerAngles(2, 1, 0);
-  ROS_DEBUG_STREAM_NAMED("updateTFValues","euler_angles = " << euler_angles.transpose());
+
   active_tf_list_[idx].values_[3] = euler_angles[0] * rad_to_deg;
   active_tf_list_[idx].values_[4] = euler_angles[1] * rad_to_deg;
   active_tf_list_[idx].values_[5] = euler_angles[2] * rad_to_deg;
@@ -743,18 +718,18 @@ void manipulateTFTab::updateTFValues(int dof, double value)
   {
     if (active_tf_list_[i].name_ == active_tfs_->currentText())
     {
-      ROS_DEBUG_STREAM_NAMED("updateTFValues","name_ = " << active_tf_list_[i].name_.toStdString());
+      // ROS_DEBUG_STREAM_NAMED("updateTFValues","name_ = " << active_tf_list_[i].name_.toStdString());
       active_tf_list_[i].values_[dof] = value;
       for (std::size_t j = 0; j < 6; j++)
       {
-        ROS_DEBUG_STREAM_NAMED("updateTFValues", j << " = " << active_tf_list_[i].values_[j]);
+        // ROS_DEBUG_STREAM_NAMED("updateTFValues", j << " = " << active_tf_list_[i].values_[j]);
       }
 
       geometry_msgs::TransformStamped tf_msg = active_tf_list_[i].getTFMsg();
-      ROS_DEBUG_STREAM_NAMED("updateTFValues","imarker_ = " << active_tf_list_[i].imarker_);
+      // ROS_DEBUG_STREAM_NAMED("updateTFValues","imarker_ = " << active_tf_list_[i].imarker_);
       if (active_tf_list_[i].imarker_)
       {
-        ROS_DEBUG_STREAM_NAMED("updateTFValues","update imarker pose...");
+        // ROS_DEBUG_STREAM_NAMED("updateTFValues","update imarker pose...");
         geometry_msgs::Pose imarker_pose;
         imarker_pose.position.x = tf_msg.transform.translation.x;
         imarker_pose.position.y = tf_msg.transform.translation.y;

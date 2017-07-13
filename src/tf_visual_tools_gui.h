@@ -88,7 +88,55 @@ struct tf_data{
 };
 
 /**
- * Tab for creating, saving, loading, removing and deleting TFs
+ * Tab for manipulating TFs
+ */
+class manipulateTFTab : public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit manipulateTFTab(QWidget *parent = 0);
+  void updateTFList();
+  static void updateTFValues(int list_index, geometry_msgs::Pose pose);
+                                                    
+protected Q_SLOTS:
+  void incrementDOF();
+  void incrementDOF(int dof, double sign);
+  
+  void editTFTextValue(QString text);
+
+  void setXYZDelta(QString text);
+  void setRPYDelta(QString text);
+
+  void setXYZDelta(double xyz_delta);
+  void setRPYDelta(double rpy_delta);
+  
+  void setQLineValues(int item_id);
+
+protected:
+  void keyPressEvent(QKeyEvent *);
+  
+private:
+
+  void updateTFValues(int dof, double value);
+  
+  static constexpr double MAX_XYZ_DELTA = 100.0;
+  static constexpr double MAX_RPY_DELTA = 360.0;
+  
+  double xyz_delta_;
+  double rpy_delta_;
+
+  QComboBox *active_tfs_;
+  QLineEdit *xyz_delta_box_;
+  QLineEdit *rpy_delta_box_;
+
+  std::vector<QLineEdit*> dof_qline_edits_;
+
+  TFRemoteReceiver *remote_receiver_;
+};
+
+/**
+ * Tab for creating & deleting TFs
  */
 class createTFTab : public QWidget
 {
@@ -96,8 +144,9 @@ class createTFTab : public QWidget
   
 public:
   explicit createTFTab(QWidget *parent = 0);
-  void updateFromList();                                           
-                        
+  void updateFromList();
+  manipulateTFTab* manipulate_tab_;                       
+                       
 protected Q_SLOTS:
   void createNewTF();
   void removeTF();
@@ -126,63 +175,6 @@ private:
   QPushButton *remove_tf_btn_;
 
   QComboBox *active_tfs_;
-
-  TFRemoteReceiver *remote_receiver_;
-};
-
-/**
- * Tab for manipulating TFs
- */
-class manipulateTFTab : public QWidget
-{
-  Q_OBJECT
-
-public:
-  explicit manipulateTFTab(QWidget *parent = 0);
-  void updateTFList();
-  static void updateTFValues(int list_index, geometry_msgs::Pose pose);
-                                                    
-protected Q_SLOTS:
-  void incrementDOF();
-  void incrementDOF(int dof, double sign);
-  
-  void editTFTextValue(QString text);
-
-  void setXYZDelta(QString text);
-  void setRPYDelta(QString text);
-
-  void setXYZDelta(double xyz_delta);
-  void setRPYDelta(double rpy_delta);
-  
-  void setQLineValues(int item_id);
-
-protected:
-  
-  
-  void keyPressEvent(QKeyEvent *);
-  // TODO: Don't think I need release...
-  // void keyReleaseEvent(QKeyEvent *); 
-  
-private:
-
-  void updateTFValues(int dof, double value);
-
-  // can't overload 'set
-  
-  static constexpr double MAX_XYZ_DELTA = 100.0;
-  static constexpr double MAX_RPY_DELTA = 360.0;
-  
-  double xyz_delta_;
-  double rpy_delta_;
-
-  QComboBox *active_tfs_;
-
-  // TODO: on select, update values
-
-  QLineEdit *xyz_delta_box_;
-  QLineEdit *rpy_delta_box_;
-
-  std::vector<QLineEdit*> dof_qline_edits_;
 
   TFRemoteReceiver *remote_receiver_;
 };

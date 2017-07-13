@@ -65,13 +65,11 @@ void RvizTFPublisher::removeTF(geometry_msgs::TransformStamped remove_tf_msg)
 
 void RvizTFPublisher::updateTF(geometry_msgs::TransformStamped update_tf_msg)
 {
-  ROS_DEBUG_STREAM_NAMED("updateTF","from: " << update_tf_msg.header.frame_id << ", to: " << update_tf_msg.child_frame_id);
   for (std::size_t i = 0; i < active_tfs_.size(); i++)
   {
     if (update_tf_msg.child_frame_id.compare(active_tfs_[i].child_frame_id) == 0 &&
         update_tf_msg.header.frame_id.compare(active_tfs_[i].header.frame_id) == 0)
     {
-      ROS_DEBUG_STREAM_NAMED("updateTF","i = " << i);
       active_tfs_[i].transform = update_tf_msg.transform;
     }                                            
   }
