@@ -58,7 +58,8 @@ TFVisualTools::TFVisualTools(QWidget* parent) : rviz::Panel(parent)
   
   new_save_load_tab_ = new saveLoadTFTab(); 
   tab_widget_->addTab(new_save_load_tab_, tr("Save / Load"));
-
+  new_save_load_tab_->create_tab_ = new_create_tab_;
+  
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addWidget(tab_widget_);
   setLayout(main_layout);
@@ -71,7 +72,6 @@ TFVisualTools::TFVisualTools(QWidget* parent) : rviz::Panel(parent)
 
 void TFVisualTools::updateTabData(int index)
 {
-  ROS_DEBUG_STREAM_NAMED("updateTabData","index = " << index);
   new_manipulate_tab_->updateTFList();
   new_create_tab_->updateFromList();
 
@@ -201,9 +201,7 @@ void createTFTab::createNewTF()
 }
 
 void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
-{
-  ROS_DEBUG_STREAM_NAMED("createNewIMarker","creating interactive marker...");
-  
+{ 
   // create a box to visualize the marker
   visualization_msgs::Marker marker;
   marker.type = visualization_msgs::Marker::CUBE;
@@ -266,19 +264,23 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
   
   if (has_menu && !menu_handler_set_)
   {
-    ROS_DEBUG_STREAM_NAMED("createNewIMarker","set menu");
-
     QString filters("rviz tf files (*.tf);;All files (*.*)");
     QString default_filter("rviz tf files (*.tf)");
 
-    std::string pkg_path = ros::package::getPath("tf_visual_tools");
+    std::string pkg_path = ros::package::getPath("tf_visual_tools") + "/config";
     
     QString directory =
       QFileDialog::getOpenFileName(0, "Load TF Menu File", QString::fromStdString(pkg_path), filters, &default_filter);
 
+    if (directory.length() == 0)
+    {
+      menu_handler_set_ = true;
+      ROS_WARN_STREAM_NAMED("createNewIMarker","iMarker menu creation canceled. Not creating iMarker menus.");
+      return;
+    }
+    
     std::string full_load_path;
     full_load_path = directory.toStdString();
-    ROS_DEBUG_STREAM_NAMED("load","load_file = " << full_load_path);
 
     std::ifstream in_file(full_load_path);
     std::string line;
@@ -821,18 +823,25 @@ void saveLoadTFTab::load()
 {
   QString filters("rviz tf files (*.tf);;All files (*.*)");
   QString default_filter("rviz tf files (*.tf)");
+
+  std::string pkg_path = ros::package::getPath("tf_visual_tools") + "/config";
   
   QString directory =
-    QFileDialog::getOpenFileName(0, "Load TF File", QDir::currentPath(), filters, &default_filter);
+    QFileDialog::getOpenFileName(0, "Load TF File", QString::fromStdString(pkg_path), filters, &default_filter);
 
+  if (directory.length() == 0)
+    return;
+  
   full_load_path_ = directory.toStdString();
-  ROS_DEBUG_STREAM_NAMED("load","load_file = " << full_load_path_);
+  ROS_INFO_STREAM_NAMED("load","load_file = " << full_load_path_);
 
   std::ifstream in_file(full_load_path_);
   std::string line;
 
   int id;
   int result;
+  int imarker;
+  int has_menu;
   char from[256];
   char to[256];
   float x, y, z, roll, pitch, yaw;
@@ -841,20 +850,11 @@ void saveLoadTFTab::load()
   {
     while (std::getline(in_file, line))
     {
-      result = sscanf(line.c_str(), "%d %s %s %f %f %f %f %f %f", &id, from, to, &x, &y, &z, &roll, &pitch, &yaw);
+      result = sscanf(line.c_str(), "%d %s %s %d %d %f %f %f %f %f %f",
+                      &id, from, to, &imarker, &has_menu, &x, &y, &z, &roll, &pitch, &yaw);
 
-      if (result == 9)
-      {
-        ROS_DEBUG_STREAM_NAMED("load",id);
-        ROS_DEBUG_STREAM_NAMED("load",from);
-        ROS_DEBUG_STREAM_NAMED("load",to);
-        ROS_DEBUG_STREAM_NAMED("load",x);
-        ROS_DEBUG_STREAM_NAMED("load",y);
-        ROS_DEBUG_STREAM_NAMED("load",z);
-        ROS_DEBUG_STREAM_NAMED("load",roll);
-        ROS_DEBUG_STREAM_NAMED("load",pitch);
-        ROS_DEBUG_STREAM_NAMED("load",yaw);
-        
+      if (result == 11)
+      {       
         // create new tf
         tf_data new_tf;
         new_tf.id_ = id;
@@ -862,17 +862,31 @@ void saveLoadTFTab::load()
         new_tf.from_ = frame_id;
         std::string child_frame_id(to);
         new_tf.to_ = child_frame_id;
+        new_tf.imarker_ = imarker;
         new_tf.values_[0] = x;
         new_tf.values_[1] = y;
         new_tf.values_[2] = z;
         new_tf.values_[3] = roll;
         new_tf.values_[4] = pitch;
         new_tf.values_[5] = yaw;
-       
+
+        bool create_menus = false;
+        if (has_menu == 1 || has_menu == 0)
+        {
+          has_menu == 1 ? create_menus = true : create_menus = false;
+        }
+        else
+        {
+          has_menu = 0;
+          ROS_WARN_STREAM_NAMED("load","'has_menu' parameter set to 0. Received bad input.");
+        }
+        
         std::string text = std::to_string(new_tf.id_) + ": " + new_tf.from_ + "-" + new_tf.to_;
         new_tf.name_ = QString::fromStdString(text);
         
         active_tf_list_.push_back(new_tf);
+        create_tab_->createNewIMarker(new_tf, has_menu);
+        
         remote_receiver_->createTF(new_tf.getTFMsg());
       }
       else
@@ -893,9 +907,14 @@ void saveLoadTFTab::save()
   QString filters("rviz tf files (*.tf);;All files (*.*)");
   QString default_filter("rviz tf files (*.tf)");
   
+  std::string pkg_path = ros::package::getPath("tf_visual_tools") + "/config";
+  
   QString directory =
-    QFileDialog::getSaveFileName(0, "Save TF File", QDir::currentPath(), filters, &default_filter);
+    QFileDialog::getSaveFileName(0, "Load TF File", QString::fromStdString(pkg_path), filters, &default_filter);
 
+  if (directory.length() == 0)
+    return;
+  
   full_save_path_ = directory.toStdString();
 
   // check if user specified file extension
@@ -903,7 +922,7 @@ void saveLoadTFTab::save()
   if (found == std::string::npos)
     full_save_path_ += ".tf";
   
-  ROS_DEBUG_STREAM_NAMED("save","save_file = " << full_save_path_);
+  ROS_INFO_STREAM_NAMED("save","file saved as = \033[1;36m" << full_save_path_ << "\033[0m");
 
   std::ofstream out_file;
   out_file.open(full_save_path_);
@@ -917,7 +936,8 @@ void saveLoadTFTab::save()
     {
       out_file << active_tf_list_[i].id_ << " ";
       out_file << active_tf_list_[i].from_ << " ";
-      out_file << active_tf_list_[i].to_;
+      out_file << active_tf_list_[i].to_ << " ";
+      out_file << active_tf_list_[i].imarker_;
       for (std::size_t j = 0; j < 6; j++)
       {
         out_file << " " << active_tf_list_[i].values_[j];

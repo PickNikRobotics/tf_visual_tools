@@ -146,7 +146,8 @@ public:
   explicit createTFTab(QWidget *parent = 0);
   void updateFromList();
   manipulateTFTab* manipulate_tab_;                       
-                       
+  void createNewIMarker(tf_data new_tf, bool has_menu);
+                                                      
 protected Q_SLOTS:
   void createNewTF();
   void removeTF();
@@ -156,7 +157,6 @@ protected Q_SLOTS:
   
 private:
   void processIMarkerFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-  void createNewIMarker(tf_data new_tf, bool has_menu);
   
   bool menu_handler_set_;
   
@@ -188,7 +188,8 @@ class saveLoadTFTab : public QWidget
 
 public:
   explicit saveLoadTFTab(QWidget *parent = 0);
-
+  createTFTab* create_tab_;
+                          
 protected Q_SLOTS:
   void load();
   void save();
