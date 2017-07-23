@@ -13,8 +13,7 @@ Screenshot of the TF Visual Tools GUI.
 
 To build this package, ``git clone`` this repo into a [catkin workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace) and be sure to install necessary dependencies by running the following command in the root of your catkin workspace:
 
-    rosdep install -y --from-paths src --ignore-src --rosdistro indigo
-
+    rosdep install -y --from-paths src --ignore-src --rosdistro kinetic
 ## Usage of TF Visual Tools:
 
 * Start Rviz and add the TF Visual Tools GUI to Rviz: `Panels > Add New Panel`
@@ -26,17 +25,18 @@ These steps are already completed when running `roslaunch tf_visual_tools demo.l
 ### Creating and Removing TFs
 ![](resources/add-remove.png)
 
-To create a TF:
+#### To create a TF:
 1. select a TF from the `from:` dropdown list or type a new name.
 1. enter a name for the TF in the `to:` line.
 1. check whether you would like the TF to have an [interactive marker](http://wiki.ros.org/rviz/Tutorials/Interactive%20Markers%3A%20Getting%20Started) associated with it.
 1. check whether you would like to attach menu options to your interactive markers. If you do want menus, you will be prompted to select a text file that contains the menu titles.
-1. click `Crate TF`.
+1. click `Create TF`.
 
-**Note: see the `File Formats` section for details about file format.
-**Note: see the `Interactive Markers and Menu Selections` for details about using the menu items.
+**Note:** see the `File Formats` section for details about file format.
 
-To remove a TF:
+**Note:** see the `Interactive Markers and Menu Selections` for details about using the menu items.
+
+#### To remove a TF:
 1. select the TF from the dropdown list.
 1. click `Remove TF`
 
@@ -48,8 +48,8 @@ For each menu item, a publisher will be created with the topic name:
 
 For example: 
 
-* Items without sub menus: `/marker/menu_item_B`
-* Items with sub menus: `/marker/menu_item_A_sub_entry_1`
+* Items without sub menus: `/imarker/menu_item_B`
+* Items with sub menus: `/imarker/menu_item_A_sub_entry_1`
 
 When the menu items are selected, a value of `true` will be published to the corresponding topic. Create a subscriber in your own code to handle menu selections.
 
@@ -58,11 +58,11 @@ When the menu items are selected, a value of `true` will be published to the cor
 
 The TFs you create can be manipulated through the GUI or the keyboard.
 
-Manipulation with the GUI:
+#### Manipulation with the GUI:
 1. select the TF that you would like to manipulate from the dropdown list.
 1. set the individual degree of freedom values or use the `+` and `-` buttons to increment the desired degree of freedom. The incrementation is determined by values set in `Delta xyz` and `Delta rpy`.
 
-Manipulation with the Keyboard:
+#### Manipulation with the Keyboard:
 1. Select the TF that you would like to manipulate from the dropdown list.
 1. Use the following commands to manipuate the TF:
 
@@ -76,9 +76,9 @@ med   i
 slow  o
 ```
 
-**NOTE: The `Manipulate` tab must have focus. If the keyboard commands are not working, try clicking the tab again as it probably lost focus.
+**Note:** The `Manipulate` tab must have focus. If the keyboard commands are not working, try clicking the tab again as it probably lost focus.
 
-Manipulation with the Interactive Markers:
+#### Manipulation with the Interactive Markers:
 1. Interactive Marker positions are changed by dragging either the grey box or grabbing one of the arrows or rings to change position or rotation of a single degree of freedom.
 
 ### Saving and Loading TFs
@@ -106,8 +106,11 @@ There are two types of files used in the `tf_visual_tools` package:
 ```
 
 `ID` - an integer id for the frame.
+
 `From` and `To` - strings with the corresponding TF names.
+
 `IMarker` and `Menus` - bool (0 or 1) indicating whether the TF has an interactive marker and menus.
+
 `X`, `Y`, `Z`, `ROLL`, `PITCH`, `YAW` - doubles corresponding to the TFs degrees of freedom.
 
 ### Interactive Marker Menus
