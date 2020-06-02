@@ -95,6 +95,7 @@ qt_wrap_cpp(MOC_FILES
 ## the previous command which is stored in ``${MOC_FILES}``.
 set(SOURCE_FILES
   src/tf_visual_tools_gui.cpp
+  ${MOC_FILES}
 )
 
 add_library(${PROJECT_NAME}_receiver src/gui_remote_receiver.cpp)
