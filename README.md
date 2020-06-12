@@ -2,10 +2,12 @@
 
 Easily move `\tf` frames around using your keyboard or mouse. Use as a simple calibration-by-eye tool or add menus and interative markers to create customized functionality.
 
-TF Visual Tools developed by [Andy McEvoy](http://github.com/mcevoyandy) and [Dave Coleman](http://dav.ee).
-
 ![](resources/demo_screenshot.png)
 Screenshot of the TF Visual Tools GUI.
+
+<img src="https://picknik.ai/assets/images/logo.jpg" width="120">
+
+This open source project was developed at [PickNik Robotics](https://picknik.ai/). Need professional ROS development and consulting? Contact us at projects@picknik.ai for a free consultation.
 
 ## Install
 
