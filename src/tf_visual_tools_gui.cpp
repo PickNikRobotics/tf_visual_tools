@@ -215,14 +215,14 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 
   visualization_msgs::InteractiveMarker int_marker;
   int_marker.header.frame_id = new_tf.from_;
-  int_marker.scale = 0.25;
+  int_marker.scale = 0.20;
   int_marker.name = new_tf.name_.toStdString();
 
-  visualization_msgs::InteractiveMarkerControl box_control;
-  box_control.always_visible = true;
-  box_control.markers.push_back(marker);
-  box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D;
-  int_marker.controls.push_back(box_control);
+  //visualization_msgs::InteractiveMarkerControl box_control;
+  //box_control.always_visible = true;
+  //box_control.markers.push_back(marker);
+  //box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D;
+  //int_marker.controls.push_back(box_control);
 
   // create the handles to control individual dofs
   visualization_msgs::InteractiveMarkerControl control;
