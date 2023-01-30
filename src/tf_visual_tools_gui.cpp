@@ -94,13 +94,15 @@ createTFTab::createTFTab(QWidget *parent) : QWidget(parent)
   from_->lineEdit()->setPlaceholderText("Add new or select existing");
   //from_->addItem(tr("Select existing or add new TF"));
   connect(from_, SIGNAL(editTextChanged(const QString &)), this, SLOT(fromTextChanged(const QString &)));
+  from_->setCurrentText("world");
   
   to_ = new QLineEdit;
   to_->setPlaceholderText("to TF");
   connect(to_, SIGNAL(textChanged(const QString &)), this, SLOT(toTextChanged(const QString &)));
+  to_->setText(QString("laser"));
 
   add_imarker_ = new QCheckBox("i marker?", this);
-  add_imarker_->setCheckState(Qt::Unchecked);
+  add_imarker_->setCheckState(Qt::Checked);
 
   add_imarker_menu_ = new QCheckBox("menus?", this);
   add_imarker_menu_->setCheckState(Qt::Unchecked); 
