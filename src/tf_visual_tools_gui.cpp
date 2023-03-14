@@ -94,13 +94,15 @@ createTFTab::createTFTab(QWidget *parent) : QWidget(parent)
   from_->lineEdit()->setPlaceholderText("Add new or select existing");
   //from_->addItem(tr("Select existing or add new TF"));
   connect(from_, SIGNAL(editTextChanged(const QString &)), this, SLOT(fromTextChanged(const QString &)));
+  from_->setCurrentText("world");
   
   to_ = new QLineEdit;
   to_->setPlaceholderText("to TF");
   connect(to_, SIGNAL(textChanged(const QString &)), this, SLOT(toTextChanged(const QString &)));
+  to_->setText(QString("laser"));
 
   add_imarker_ = new QCheckBox("i marker?", this);
-  add_imarker_->setCheckState(Qt::Unchecked);
+  add_imarker_->setCheckState(Qt::Checked);
 
   add_imarker_menu_ = new QCheckBox("menus?", this);
   add_imarker_menu_->setCheckState(Qt::Unchecked); 
@@ -215,14 +217,14 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 
   visualization_msgs::InteractiveMarker int_marker;
   int_marker.header.frame_id = new_tf.from_;
-  int_marker.scale = 0.25;
+  int_marker.scale = 0.20;
   int_marker.name = new_tf.name_.toStdString();
 
-  visualization_msgs::InteractiveMarkerControl box_control;
-  box_control.always_visible = true;
-  box_control.markers.push_back(marker);
-  box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D;
-  int_marker.controls.push_back(box_control);
+  //visualization_msgs::InteractiveMarkerControl box_control;
+  //box_control.always_visible = true;
+  //box_control.markers.push_back(marker);
+  //box_control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_ROTATE_3D;
+  //int_marker.controls.push_back(box_control);
 
   // create the handles to control individual dofs
   visualization_msgs::InteractiveMarkerControl control;
