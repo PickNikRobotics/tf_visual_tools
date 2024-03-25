@@ -239,16 +239,16 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 //   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 //   int_marker.controls.push_back(control);
 
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 1;
-  control.orientation.z = 0;
+//   control.orientation.w = 1;
+//   control.orientation.x = 0;
+//   control.orientation.y = 1;
+//   control.orientation.z = 0;
 //   control.name = "rotate_y";
 //   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
 //   int_marker.controls.push_back(control);
-  control.name = "move_y";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-  int_marker.controls.push_back(control);
+//   control.name = "move_y";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+//   int_marker.controls.push_back(control);
 // 
 //   control.orientation.w = 1;
 //   control.orientation.x = 0;
