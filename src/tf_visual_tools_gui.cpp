@@ -228,38 +228,48 @@ void createTFTab::createNewIMarker(tf_data new_tf, bool has_menu)
 
   // create the handles to control individual dofs
   visualization_msgs::InteractiveMarkerControl control;
-  control.orientation.w = 1;
-  control.orientation.x = 1;
-  control.orientation.y = 0;
-  control.orientation.z = 0;
-  control.name = "rotate_x";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-  int_marker.controls.push_back(control);
-  control.name = "move_x";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-  int_marker.controls.push_back(control);
+//   control.orientation.w = 1;
+//   control.orientation.x = 1;
+//   control.orientation.y = 0;
+//   control.orientation.z = 0;
+//   control.name = "rotate_x";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+//   int_marker.controls.push_back(control);
+//   control.name = "move_x";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+//   int_marker.controls.push_back(control);
 
+//   control.orientation.w = 1;
+//   control.orientation.x = 0;
+//   control.orientation.y = 1;
+//   control.orientation.z = 0;
+//   control.name = "rotate_y";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+//   int_marker.controls.push_back(control);
+//   control.name = "move_y";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+//   int_marker.controls.push_back(control);
+// 
+//   control.orientation.w = 1;
+//   control.orientation.x = 0;
+//   control.orientation.y = 0;
+//   control.orientation.z = 1;
+//   control.name = "rotate_z";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+//   int_marker.controls.push_back(control);
+//   control.name = "move_z";
+//   control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+//   int_marker.controls.push_back(control);
+  
   control.orientation.w = 1;
   control.orientation.x = 0;
   control.orientation.y = 1;
   control.orientation.z = 0;
-  control.name = "rotate_y";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
+  control.name = "move_plane_xy";
+  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_PLANE;
   int_marker.controls.push_back(control);
-  control.name = "move_y";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-  int_marker.controls.push_back(control);
-
-  control.orientation.w = 1;
-  control.orientation.x = 0;
-  control.orientation.y = 0;
-  control.orientation.z = 1;
-  control.name = "rotate_z";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
-  int_marker.controls.push_back(control);
-  control.name = "move_z";
-  control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
-  int_marker.controls.push_back(control);
+  
+  
   
   imarker_server_->insert(int_marker);
   imarker_server_->setCallback(int_marker.name, boost::bind( &createTFTab::processIMarkerFeedback, this, _1) );
