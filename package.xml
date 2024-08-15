@@ -33,6 +33,7 @@
   <depend>message_runtime</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>eigen_conversions</depend>
 
   <export>
     <rviz plugin="${prefix}/plugin_description.xml"/>

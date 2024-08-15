@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   rviz
   std_msgs
   geometry_msgs
+  eigen_conversions
 )
 
 find_package(Eigen3 REQUIRED)
