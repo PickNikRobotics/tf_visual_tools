@@ -7,7 +7,7 @@
   <maintainer email="mcevoy.andy@gmail.com">Andy McEvoy</maintainer>
   <maintainer email="davetcoleman@gmail.com">Dave Coleman</maintainer>
   
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">https://github.com/mcevoyandy/tf_visual_tools</url>
   <url type="bugtracker">https://github.com/mcevoyandy/tf_visual_tools/issues</url>
